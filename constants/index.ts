@@ -1,0 +1,1 @@
+export const STARRED_API_LIMIT = 10

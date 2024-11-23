@@ -2,5 +2,8 @@
 import { signIn } from "next-auth/react"
  
 export function SignIn() {
-  return <button onClick={() => signIn()}>Sign In</button>
+    return signIn('email', {
+        callbackUrl: '/jobs'
+    })
+  // return <button onClick={() => signIn('email', {})}>Sign In</button>
 }

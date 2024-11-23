@@ -1,14 +1,15 @@
 import React from "react"
-import Layout from "../components/Layout"
-import { SignIn } from "../components/SignIn"
+import { useRouter } from "next/router"
 
+const Home: React.FC = () => {
+  const router = useRouter()
 
-const Blog: React.FC = () => {
-  return (
-    <Layout>
-      <SignIn/>
-    </Layout>
-  )
+  /**
+   * Always redirect to dashboard
+   */
+  router.push('/dashboard')
+
+  return null
 }
 
-export default Blog
+export default Home
