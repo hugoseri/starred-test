@@ -17,6 +17,8 @@ datasource db {
     sessions      Session[]
     // Optional for WebAuthn support
     Authenticator Authenticator[]
+
+    favoriteJobs FavoriteJob[]
    
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -75,4 +77,12 @@ datasource db {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
    
     @@id([userId, credentialID])
+  }
+
+  model FavoriteJob {
+    jobId Int
+    userId String
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    @@id([userId, jobId])
   }
