@@ -13,8 +13,9 @@ You can access a live version here [starred-test.vercel.app](https://starred-tes
 - valid email
 
 1. Create `.env` file from `.env.example`
-1. Install dependencies: `npm install`
-2. Run project: `npm run dev`
+2. Install dependencies: `npm install`
+3. Run project: `npm run dev`
+4. Project runs on `localhost:3000` 
 
 # Features
 The project is a basic listing of jobs from a provided API.
