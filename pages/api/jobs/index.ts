@@ -16,7 +16,7 @@ export default async function handler(
     if (req.method === 'GET') {
         try {
             const search = query.search?.trim()
-            const page = query.page ?? 0
+            const page = Number(query.page) ?? 0
             let jobs: StarredApiGetAllJobsRo;
             if (search?.length < 2) {
                 jobs = await services.starredApi.getAll({

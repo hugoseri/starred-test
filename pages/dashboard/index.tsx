@@ -14,20 +14,31 @@ const Dashboard: React.FC = () => {
     })
     const [search, setSearch] = useState('')
     const debounchedSearch = useDebounce(search, 500)
+    const [query, setQuery] = useState<GetAllJobsQuery>({
+      page: 0,
+      search: ''
+    })
+
+    /**
+     * Reset current page each time search changes
+     */
+    useEffect(() => {
+      setQuery({
+        page: 0,
+        search: debounchedSearch,
+      })
+    }, [debounchedSearch])
 
     const [data, setData] = useState<StarredApiJob[]>([])
     const [isLoading, setLoading] = useState(false)
    
-    const fetchJobs = useCallback(async (search: string, page: number) => {
+    const fetchJobs = useCallback(async (query: GetAllJobsQuery) => {
       setLoading(true)
 
       try {
         const res = await axiosClientInstance.request<StarredApiGetAllJobsRo>({
           url: '/jobs',
-          params: {
-            search,
-            page,
-          }
+          params: query,
         })
   
         if (res.status === 200) {
@@ -41,11 +52,17 @@ const Dashboard: React.FC = () => {
       setLoading(false)
     }, [])
 
-    useEffect(() => {
+    /**
+     * Fetch jobs each time pagination or search changes
+    */
+   useEffect(() => {
+      /**
+      * Avoid fetching jobs if it's already loading
+      */
       if (!isLoading) {
-        fetchJobs(debounchedSearch, pagination.currentPage)
+        fetchJobs(query)
       }
-    }, [debounchedSearch, pagination.currentPage])
+    }, [JSON.stringify(query)])
 
     return (
       <div>
@@ -71,9 +88,7 @@ const Dashboard: React.FC = () => {
                   {job.job_title}
                   <JobInteraction 
                     job={job}
-                    refetchJobs={() => {
-                      fetchJobs(search, pagination.currentPage)
-                    }}
+                    refetchJobs={() => fetchJobs(query)}
                   />                  
                 </h3>
                 <h5>
@@ -87,9 +102,9 @@ const Dashboard: React.FC = () => {
             {pagination.currentPage > pagination.firstPage && (
               <button
                 onClick={() => {
-                  setPagination(old => ({
+                  setQuery(old => ({
                     ...old,
-                    currentPage: old.currentPage - 1
+                    page: pagination.currentPage - 1
                   }))
                 }}
               >
@@ -100,9 +115,9 @@ const Dashboard: React.FC = () => {
             {pagination.currentPage < pagination.lastPage && (
               <button
                 onClick={() => {
-                  setPagination(old => ({
+                  setQuery(old => ({
                     ...old,
-                    currentPage: old.currentPage + 1
+                    page: pagination.currentPage + 1
                   }))
                 }}
               >
