@@ -3,6 +3,9 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import EmailProvider from "next-auth/providers/email";
 import { prisma } from "../../../prisma";
 
+/**
+ * Next-auth setup
+ */
 export const authOptions: NextAuthOptions = {
   providers: [
     EmailProvider({

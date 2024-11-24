@@ -26,6 +26,9 @@ export const JobInteraction: React.FC<JobInteractionProps> = ({
             url: `/jobs/fav/${job.id}`,
           })
     
+          /**
+           * Refetch jobs to refresh data
+           */
           if (res.status === 200) {
             refetchJobs()
           }

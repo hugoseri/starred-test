@@ -49,8 +49,13 @@ const Dashboard: React.FC = () => {
         if (res.status === 200) {
           setData(res.data.data)
           setPagination(res.data.pagination)
-          if (res.data.data.length > 0)
+
+          /**
+           * If there are jobs and selected job is not among new results, select first job result
+           */
+          if (res.data.data.length > 0 && res.data.data.some(job => job.id === selectedJob?.id)) {
             setSelectedJob(res.data.data[0])
+          }
         }
       } catch (err) {
         console.log("An error occured", err.status)

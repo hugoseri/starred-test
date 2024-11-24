@@ -5,6 +5,10 @@ import { authOptions } from "../auth/[...nextauth]";
 import { services } from "../../../services";
 import { STARRED_API_LIMIT } from "../../../constants";
 
+/**
+ * Endpoint to retrieve jobs from API.
+ * This handles page and search query parameters.
+ */
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<StarredApiGetAllJobsRo>
@@ -18,28 +22,39 @@ export default async function handler(
             const search = query.search?.trim()
             const page = Number(query.page) ?? 0
             let jobs: StarredApiGetAllJobsRo;
+            /**
+             * If no search or not enough characters, fetch all jobs
+             */
             if (search?.length < 2) {
                 jobs = await services.starredApi.getAll({
                     page,
                 })
             } else {
+                /**
+                 * Otherwise:
+                 * - Get recommendations IDs from search
+                 * - Retrieve jobs from current page recommended IDs
+                 */
                 const searchedJobIds = await services.starredApi.getRecommendations({
                     search,
                 })
-                const searchedJobs = await Promise.all(searchedJobIds.jobIds.map(id => services.starredApi.getById({ id })))
+                let searchedJobsIdsForPage = searchedJobIds.jobIds.slice(page * STARRED_API_LIMIT, (page + 1) * STARRED_API_LIMIT)
 
-                let searchedJobsForPage = searchedJobs.slice(page * STARRED_API_LIMIT, (page + 1) * STARRED_API_LIMIT)
+                const searchedJobsForPage = await Promise.all(searchedJobsIdsForPage.map(id => services.starredApi.getById({ id })))
 
                 jobs = {
                     pagination: {
                         currentPage: page,
                         firstPage: 0,
-                        lastPage: Math.floor((searchedJobs.length - 1) / STARRED_API_LIMIT)
+                        lastPage: Math.floor((searchedJobIds.jobIds.length - 1) / STARRED_API_LIMIT)
                     },
                     data: searchedJobsForPage
                 }
             }
 
+            /**
+             * If user is connected, inject favorite jobs in Starred API jobs
+             */
             if (session) {
                 const user = await services.users.getByEmail({ email: session.user.email })
 
