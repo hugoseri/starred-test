@@ -18,7 +18,7 @@ export default async function handler(
             const search = query.search?.trim()
             const page = query.page ?? 0
             let jobs: StarredApiGetAllJobsRo;
-            if (!search) {
+            if (search?.length < 2) {
                 jobs = await services.starredApi.getAll({
                     page,
                 })
@@ -29,19 +29,6 @@ export default async function handler(
                 const searchedJobs = await Promise.all(searchedJobIds.jobIds.map(id => services.starredApi.getById({ id })))
 
                 let searchedJobsForPage = searchedJobs.slice(page * STARRED_API_LIMIT, (page + 1) * STARRED_API_LIMIT)
-                if (session) {
-                    const user = await services.users.getByEmail({ email: session.user.email })
-
-                    const favoriteJobs = await services.favoriteJobs.retrieve({
-                        jobIds: searchedJobsForPage.map(job => job.id),
-                        userId: user.id
-                    })
-
-                    searchedJobsForPage = searchedJobsForPage.map(job => ({
-                        ...job,
-                        isFavorite: favoriteJobs.find(fav => fav.jobId === job.id)
-                    }))
-                }
 
                 jobs = {
                     pagination: {
@@ -50,6 +37,23 @@ export default async function handler(
                         lastPage: Math.floor((searchedJobs.length - 1) / STARRED_API_LIMIT)
                     },
                     data: searchedJobsForPage
+                }
+            }
+
+            if (session) {
+                const user = await services.users.getByEmail({ email: session.user.email })
+
+                const favoriteJobs = await services.favoriteJobs.retrieve({
+                    jobIds: jobs.data.map(job => job.id),
+                    userId: user.id
+                })
+
+                jobs = {
+                    ...jobs,
+                    data: jobs.data.map(job => ({
+                        ...job,
+                        is_favorite: favoriteJobs.some(fav => fav.jobId === job.id)
+                    }))
                 }
             }
 
