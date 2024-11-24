@@ -1,9 +1,9 @@
 import React from "react"
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./ui/table"
+import { Table, TableBody, TableCell, TableRow } from "./ui/table"
 import { JobInteraction } from "./job-interaction"
 import { Skeleton } from "./ui/skeleton"
 import { ScrollArea } from "./ui/scroll-area"
-import { Separator } from "./ui/separator"
+import { STARRED_API_LIMIT } from "@/constants"
 
 export interface JobsTableProps {
     jobs: StarredApiJob[],
@@ -25,7 +25,7 @@ export const JobsTable: React.FC<JobsTableProps> = ({
         return (
             <div className="flex flex-col gap-1">
                 {
-                    Array.from(Array(10)).map(idx => (
+                    Array.from(Array(STARRED_API_LIMIT)).map(idx => (
                         <>
                             <Skeleton className="w-full h-16"/>
                         </>

@@ -49,15 +49,20 @@ const Dashboard: React.FC = () => {
         if (res.status === 200) {
           setData(res.data.data)
           setPagination(res.data.pagination)
-          if (res.data.data.length > 0)
+
+          /**
+           * If there are jobs and selected job is not among new results, select first job result
+           */
+          if (res.data.data.length > 0 && !res.data.data.some(job => job.id === selectedJob?.id)) {
             setSelectedJob(res.data.data[0])
+          }
         }
       } catch (err) {
         console.log("An error occured", err.status)
       }
 
       setLoading(false)
-    }, [])
+    }, [selectedJob])
 
     /**
      * Fetch jobs each time pagination or search changes
@@ -81,16 +86,16 @@ const Dashboard: React.FC = () => {
             <UserNav />
           </div>
         </div>
-        <div className="max-w-screen-lg rounded bg-white p-8 mx-auto h-[90vh] overflow-hidden">
-          <div className="flex flex-row gap-5 wrap">
-            <div className="basis-1/2 flex flex-col gap-4">
+        <div className="max-w-screen-lg rounded bg-white p-8 mx-auto h-[90%] overflow-y-hidden">
+          <div className="flex flex-row gap-5 h-full wrap">
+            <div className="basis-1/2 flex justify-between flex-col h-full gap-4">
               <Input
-                className="h-[5vh]"
+                className="basis-auto"
                 placeholder="Search by job title"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
-              <ScrollArea className="h-[70vh]">
+              <ScrollArea className="h-full">
                 <JobsTable
                   jobs={data}
                   refetch={() => fetchJobs(query)}
@@ -99,7 +104,7 @@ const Dashboard: React.FC = () => {
                   loading={isLoading}
                 />
               </ScrollArea>
-            <div className="h-[5vh]">
+            <div className="basis-10">
               <Paginator
                 pagination={pagination}
                 onClickNext={() => {
@@ -119,11 +124,13 @@ const Dashboard: React.FC = () => {
           </div>
           <Separator orientation="vertical" />
           <div className="basis-1/2">
-            <JobDetails 
-              job={selectedJob}
-              refetchJobs={() => fetchJobs(query)}
-            />
-            </div>
+            <ScrollArea className="h-full">
+              <JobDetails 
+                job={selectedJob}
+                refetchJobs={() => fetchJobs(query)}
+              />
+            </ScrollArea>
+          </div>
           </div>
         </div>
       </div>

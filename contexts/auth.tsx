@@ -1,8 +1,7 @@
 import React from 'react';
 import { Session } from 'next-auth';
-import { SessionProvider, signIn, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { createContext } from 'react';
-import { useRouter } from "next/router"
 import { Spinner } from '@/components/ui/spinner';
 
 export type AuthContextType = {
@@ -17,13 +16,22 @@ const initialAuth: AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(initialAuth);
 
+/**
+ * Provider to protect private routes
+ */
 export const AuthProvider = ({children}) => {
     const { data: session, status } = useSession()
  
+    /**
+     * Redirect to Next sign in page if user is not connected
+     */
     if (status === 'unauthenticated') {
         signIn()
     }
 
+    /**
+     * Display loader
+     */
     if (status === 'loading') {
         return (
             <div className='bg-slate-50 flex w-screen h-screen justify-center items-center'>
@@ -32,6 +40,9 @@ export const AuthProvider = ({children}) => {
         )
     }
 
+    /**
+     * Display app content when user is connected
+     */
     return (
         <AuthContext.Provider value={{ session, status }}>
             {children}
