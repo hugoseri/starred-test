@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { axiosClientInstance } from "../../utils/axios"
 import { useDebounce } from "../../hooks/debounce"
-import { JobInteraction } from "../../components/JobInteraction"
+import { UserNav } from "@/components/user-nav"
+import { JobsTable } from "@/components/jobs-table"
+import { Separator } from "@/components/ui/separator"
+import { JobDetails } from "@/components/job-details"
+import { Input } from "@/components/ui/input"
+import { Paginator } from "@/components/paginator"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const Dashboard: React.FC = () => {
-    const { data: session } = useSession()
-
     const [pagination, setPagination] = useState<StarredApiPagination>({
       currentPage: 0,
       firstPage: 0,
@@ -29,6 +33,7 @@ const Dashboard: React.FC = () => {
       })
     }, [debounchedSearch])
 
+    const [selectedJob, setSelectedJob] = useState<StarredApiJob | undefined>()
     const [data, setData] = useState<StarredApiJob[]>([])
     const [isLoading, setLoading] = useState(false)
    
@@ -44,6 +49,8 @@ const Dashboard: React.FC = () => {
         if (res.status === 200) {
           setData(res.data.data)
           setPagination(res.data.pagination)
+          if (res.data.data.length > 0)
+            setSelectedJob(res.data.data[0])
         }
       } catch (err) {
         console.log("An error occured", err.status)
@@ -65,65 +72,58 @@ const Dashboard: React.FC = () => {
     }, [JSON.stringify(query)])
 
     return (
-      <div>
-        <p>Signed in as {session?.user?.email}</p>
-        <button
-          onClick={() => signOut()}
-        >
-          Disconnect
-        </button>
-        <div>
-          <input 
-            placeholder="Search by job title"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          {
-            isLoading ?
-            <span>Data loading...</span>
-            :
-            data.map(job => (
-              <div>
-                <h3>
-                  {job.job_title}
-                  <JobInteraction 
-                    job={job}
-                    refetchJobs={() => fetchJobs(query)}
-                  />                  
-                </h3>
-                <h5>
-                  {job.company}
-                </h5>
-                <p>{job.description}</p>
-              </div>
-            ))
-          }
+      <div className="flex bg-slate-50 h-screen flex-1  flex-col space-y-8 p-8 md:flex">
+        <div className="flex h-[1vh] items-center justify-between space-y-2">
           <div>
-            {pagination.currentPage > pagination.firstPage && (
-              <button
-                onClick={() => {
-                  setQuery(old => ({
-                    ...old,
-                    page: pagination.currentPage - 1
-                  }))
-                }}
-              >
-                Previous page
-              </button>
-            )}
-            Page {pagination.currentPage + 1}
-            {pagination.currentPage < pagination.lastPage && (
-              <button
-                onClick={() => {
+            <h2 className="text-2xl font-bold tracking-tight">Starred.com</h2>
+          </div>
+          <div className="flex items-center space-x-2">
+            <UserNav />
+          </div>
+        </div>
+        <div className="max-w-screen-lg rounded bg-white p-8 mx-auto h-[90vh] overflow-hidden">
+          <div className="flex flex-row gap-5 wrap">
+            <div className="basis-1/2 flex flex-col gap-4">
+              <Input
+                className="h-[5vh]"
+                placeholder="Search by job title"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+              <ScrollArea className="h-[70vh]">
+                <JobsTable
+                  jobs={data}
+                  refetch={() => fetchJobs(query)}
+                  onJobClick={(job) => setSelectedJob(job)}
+                  selectedJobId={selectedJob?.id}
+                  loading={isLoading}
+                />
+              </ScrollArea>
+            <div className="h-[5vh]">
+              <Paginator
+                pagination={pagination}
+                onClickNext={() => {
                   setQuery(old => ({
                     ...old,
                     page: pagination.currentPage + 1
                   }))
                 }}
-              >
-                Next page
-              </button>
-            )}
+                onClickPrevious={() => {
+                  setQuery(old => ({
+                    ...old,
+                    page: pagination.currentPage - 1
+                  }))
+                }}
+              />
+            </div>
+          </div>
+          <Separator orientation="vertical" />
+          <div className="basis-1/2">
+            <JobDetails 
+              job={selectedJob}
+              refetchJobs={() => fetchJobs(query)}
+            />
+            </div>
           </div>
         </div>
       </div>
