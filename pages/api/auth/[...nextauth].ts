@@ -11,6 +11,9 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   adapter: PrismaAdapter(prisma),
+  theme: {
+    colorScheme: "light",
+  },
 }
 
 export default NextAuth(authOptions)

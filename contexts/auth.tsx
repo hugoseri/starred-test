@@ -3,6 +3,7 @@ import { Session } from 'next-auth';
 import { SessionProvider, signIn, useSession } from 'next-auth/react';
 import { createContext } from 'react';
 import { useRouter } from "next/router"
+import { Spinner } from '@/components/ui/spinner';
 
 export type AuthContextType = {
     session: Session | null,
@@ -25,7 +26,9 @@ export const AuthProvider = ({children}) => {
 
     if (status === 'loading') {
         return (
-            <div>Loading...</div>
+            <div className='bg-slate-50 flex w-screen h-screen justify-center items-center'>
+                <Spinner/>
+            </div>
         )
     }
 
