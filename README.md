@@ -1,4 +1,10 @@
 # Introduction
+
+<p align="center">
+  <img src="utils/app-screenshot.png" alt="Overview" height="300" width="600"/>
+  <br/>
+</p>
+
 This project is a technical test based on [this repository](https://github.com/starred-com/starred-case).
 
 You can access a live version here [starred-test.vercel.app](https://starred-test.vercel.app/).
@@ -28,10 +34,12 @@ Main features include:
 - View job details
 - Add/remove a job from favorites
 - Logout
+- Live version online
+- Automatic deployment
 
 ## API endpoints
 - `GET` `/api/jobs` list all jobs
-- `PATCH` `/api/jobs/fav/:jobId` add/remove job to favorites
+- `PATCH` `/api/jobs/fav/:jobId` toggle job from favorites
 
 # Tech used
 
@@ -42,12 +50,25 @@ Main features include:
 - **TailwindCSS** + **shadcn** for styling
 
 # Next steps
-- Handle filter by favorite jobs
+
+- Standard RESTFul API
+  - add/remove job to favorites is not idempotent + doesn't return updated data
+- Filter by favorite jobs
+- Filter persistency using URL to easily save a search
 - Responsive design for mobile
 - Error management (frontend & backend)
-- Data validation (using Zod for instance)
-- Frontend cache management (using React Query for example)
+- Data validation (e.g Zod)
+- Frontend cache management (e.g React Query)
+- Backend cache management (e.g Redis)
+- More endpoints
+  - get job by id
+  - bulk add jobs to favorites
+  - bulk remove job from favorites
+  - get users
+- Admin dashboard: see users, favorites...
+- Optimistic update when adding/removing a favorite
 - Go to first/last page
+- Add several auth providers (LinkedIn, Google...)
 - Unit testing
 - Custom magic link email
 - Custom home + signin pages
