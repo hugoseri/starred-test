@@ -37,18 +37,6 @@ Main features include:
 - Live version online
 - Automatic deployment
 
-## API endpoints
-- `GET` `/api/jobs` list all jobs
-- `PATCH` `/api/jobs/fav/:jobId` toggle job from favorites
-
-# Tech used
-
-- **TypeScript** for type-safe environment
-- **Next.JS** for easy app deployment and hosting on Vercel.
-- **Vercel** + **Supabase** for hosting
-- **Prisma** for database ORM
-- **TailwindCSS** + **shadcn** for styling
-
 # Next steps
 
 - Standard RESTFul API
@@ -75,3 +63,27 @@ Main features include:
 - Branding
 - Dockerization to locally launch the project easily
 - Linter + formatter
+
+
+# Technical information
+
+## API endpoints
+
+- `GET` `/api/jobs` list all jobs
+- `PATCH` `/api/jobs/fav/:jobId` toggle job from favorites
+
+## Architecture overview
+
+<p align="center">
+  <img src="utils/architecture-diagram.png" alt="Architecture diagram" height="400" width="1200"/>
+  <br/>
+</p>
+
+## Tech used
+
+- **TypeScript** for type-safe environment
+- **Next.JS** for easy app deployment and hosting on Vercel.
+- **Vercel** + **Supabase** for hosting
+- **Prisma** for database ORM
+- **TailwindCSS** + **shadcn** for styling
+
